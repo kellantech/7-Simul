@@ -1,0 +1,245 @@
+<html>
+<head>
+
+<style>
+.btn {
+	background-color:#eeeeee;
+	border: 1px solid black;
+	
+}
+.btn:hover{
+	background-color:#bfbfbf;
+}
+</style>
+
+</head>
+
+
+
+<body>
+
+<h1>7-Simul (bpaul) memo trainer</h1>
+
+<canvas id="c" width="500" height="500"></canvas>
+
+<button id="tm" class="btn">start timer</button>
+<br><br><br>
+
+<button onclick="location.reload()" class="btn">new scramble</button>
+<h2>Instructions:</h2>
+<h4>
+Press f or click clock to flip (y2) <br>
+Press enter to see memo <br><br>
+ 
+
+white face is front
+</h4>
+
+
+<form>
+	<label>use A-E for 7-11</label>
+	<input type="checkbox" id="cb" >
+</form>
+
+
+
+<script>
+
+
+document.body.onload = ()=>{
+	document.getElementById("cb").checked = localStorage.getItem("cb") * 1
+}
+document.body.onbeforeunload = ()=>{
+
+	localStorage.setItem("cb",(document.getElementById("cb").checked)*1)
+}
+
+const mod = (n, m) => (n % m + m) % m; // ???????
+ 
+
+
+const cnv = document.getElementById("c");
+
+const ctx = cnv.getContext("2d");
+
+function tr(x){
+console.log(x)
+x = mod(x,12)
+
+
+if (x > 6){
+x = -(12-x)
+
+}
+
+return x
+
+}
+
+function cir(x,y,r,f=0){
+	ctx.beginPath();
+	ctx.arc(x,y,r,0,Math.PI*2,false);
+	if (f != 0){
+		ctx.fillStyle = f;
+		ctx.fill()
+	}
+	else {
+		ctx.stroke();
+	}
+	ctx.closePath()
+}
+
+function line(x1,y1,x2,y2,w=5){
+	var s = ctx.lineWidth
+	ctx.lineWidth = w;
+	ctx.beginPath()
+	ctx.moveTo(x1,y1)
+	ctx.lineTo(x2,y2)
+	ctx.stroke()
+	ctx.closePath();
+	ctx.lineWidth = s
+}
+
+function ang(x,y,ln,a,w=5){
+	a /= 57.2957795
+	a = Math.PI - a
+	line(x,y,x+(ln*Math.sin(a)),y+(ln*Math.cos(a)),w)
+}
+function drawclock(x,y,n,b=0){
+	if (b){
+		lc = "#ffffff"
+		bc = "#000000"
+	}
+	else {
+		bc = 0
+		lc = "#000000"
+	}
+	var s = ctx.strokeStyle
+	ctx.strokeStyle = lc
+	cir(x,y,50,bc)
+	
+	
+	ang(x,y,45,n*(360/12))
+	ctx.strokeStyle = s
+
+}
+
+
+
+function rand(){
+	return Math.floor(Math.random()*13)
+}
+
+
+function df(a,b,c,d,e, f,g,h,i,  bc){
+drawclock(60,60,f,bc)
+drawclock(180,60,a,bc)
+drawclock(300,60,g,bc)
+
+
+drawclock(60,180,d,bc)
+drawclock(180,180,e,bc)
+drawclock(300,180,b,bc)
+
+
+drawclock(60,300,i,bc)
+drawclock(180,300,c,bc)
+drawclock(300,300,h,bc)
+}
+
+
+
+
+var [U,R,D,L,C] = [rand(),rand(),rand(),rand(),rand()]
+var [UL,UR,DR,DL] = [rand(),rand(),rand(),rand()]
+var [u,r,d,l,c] = [rand(),rand(),rand(),rand(),rand()]
+
+
+
+var ul = 12 - UR;
+var ur = 12 - UL;
+var dr = 12 - DL;
+var dl = 12 - DR;
+
+function to(a, b) {
+  return b - a;
+}
+
+let m1 = tr(to(L, U) + to(l, ul));
+let m2 = tr(to(u, c));
+let m3 = tr(to(l, u));
+let m4 = tr(to(R, D) + to(r, dr));
+let m5 = tr(to(d, c));
+
+mp1 = {1:"1",2:"2",3:"3",4:"4",5:"5",6:"6",'-1':"A",'-2':"B",'-3':"C",'-4':"D",'-5':"E",0:0}
+
+var bk= 0
+
+
+df(U,R,D,L,C,UL,UR,DR,DL)
+
+function f(){
+
+	if (bk == 0){
+		bk = 1
+		ctx.clearRect(0,0,500,500)
+	
+		df(u,r,d,l,c,ul,ur,dr,dl,1)
+	}
+	else{
+		bk = 0
+		ctx.clearRect(0,0,500,500)
+	
+		df(U,R,D,L,C,UL,UR,DR,DL)
+	}
+}
+
+var tmr = 0
+var tmt = 0
+cnv.addEventListener("click",f)
+
+document.getElementById("tm").addEventListener("click",()=>{
+	tmr = 1
+})
+
+setInterval(()=>{
+	if (tmr){tmt += .1}
+	
+},100)
+
+
+
+document.addEventListener("keydown",(e)=>{
+
+	if (e.keyCode == 70){
+	f()
+		
+		
+	}
+	if (e.keyCode == 13){
+		var tx = " "
+		if (tmr){
+		
+	
+			tx = `\n${(Math.round(tmt*10))/10} seconds`
+		}
+		tmr = 0
+		if (document.getElementById("cb").checked){
+			alert(`${mp1[m1]} ${mp1[m2]} ${mp1[m3]} ${mp1[m4]} ${mp1[m5]} ${tx}`)
+		}
+		else{
+			alert(`${m1} ${m2} ${m3} ${m4} ${m5} ${tx}`)
+		}
+	}
+})
+
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
